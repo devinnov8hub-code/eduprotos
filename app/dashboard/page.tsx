@@ -12,7 +12,7 @@ export default function Dashboard({ name }: DashboardProps) {
       <Sidebar />
       <section className="flex flex-col w-full ml-10">
         <Header children={<div>Dashboard</div>} />
-        <main className="bg-gray-50 h-full p-5">
+        <main className="bg-gray-50 h-full p-5 flex">
         <section className="sec-1">
           <div className=" box-1 flex items-center justify-between bg-white rounded">
             <div>
@@ -26,7 +26,7 @@ export default function Dashboard({ name }: DashboardProps) {
         </section>
         <section className="sec-2 w-2/5">
           <img src="" alt="" />
-          c
+          <h1 className="text-black p-4">calendar</h1>
         </section>
         </main>
       </section>
