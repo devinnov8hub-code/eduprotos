@@ -33,7 +33,7 @@ export default function CourseContent() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="ml-auto flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
+          className="ml-auto flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
         >
           <PlusCircle className="w-4 h-4" />
           Create lecture
@@ -79,16 +79,16 @@ export default function CourseContent() {
                       <span>{lec.title} PDF</span>
                     </div>
 
-                    <Download className="w-6 h-6 cursor-pointer" />
+                    <Download className="w-6 h-6 cursor-pointer text-black" />
                   </div>
 
                   {/* Right buttons */}
                   <div className="flex gap-4">
-                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
+                    <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
                       <FileText className="w-5 h-5" /> Upload note
                     </button>
 
-                    <button className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
+                    <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
                       <PlusCircle className="w-5 h-5" /> Create quiz
                     </button>
                   </div>

@@ -39,7 +39,7 @@ export default function Courses() {
             <div className="flex items-center w-full mb-6">
               <div className="flex flex-col">
                 <h1 className="text-2xl font-bold text-black">
-                  ENT 102 – Introduction to English 2
+                  ENT 102 – Introduction to English 23
                 </h1>
                 <p className="text-sm text-gray-500">Lecturer: Dr. Johnson</p>
               </div>
@@ -47,7 +47,7 @@ export default function Courses() {
               {/* Button */}
               <button
                 onClick={openModal}
-                className="ml-auto flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
+                className="ml-auto flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
               >
                 <PlusCircle className="w-4 h-4" />
                 Create lecture
@@ -59,7 +59,7 @@ export default function Courses() {
               <h1 className="text-black font-bold text-xl mb-4">Course content</h1>
 
               {lectures.length === 0 && (
-                <p className="text-gray-500">No lectures created yet.</p>
+                <p className="text-gray-500 text-black">No lectures created yet.</p>
               )}
 
               <div className="divide-y">
@@ -85,7 +85,7 @@ export default function Courses() {
             <input
               type="text"
               placeholder="Lecture number"
-              className="w-full p-2 border rounded mb-3"
+              className="w-full p-2 border rounded mb-3 text-black placeholder-black"
               value={lectureNumber}
               onChange={(e) => setLectureNumber(e.target.value)}
             />
@@ -93,12 +93,12 @@ export default function Courses() {
             <input
               type="text"
               placeholder="Lecture title"
-              className="w-full p-2 border rounded mb-4"
+              className="w-full p-2 border rounded mb-4 text-black placeholder-black"
               value={lectureTitle}
               onChange={(e) => setLectureTitle(e.target.value)}
             />
             <button
-              className="px-4 py-2 bg-purple-600 text-white rounded mr-2"
+              className="px-4 py-2 bg-[#5955B3] text-white rounded mr-2"
               onClick={() => {
                 if (lectureNumber && lectureTitle) {
                   setLectures([...lectures, { number: lectureNumber, title: lectureTitle }]);
@@ -111,7 +111,7 @@ export default function Courses() {
               Save
             </button>
             <button
-              className="px-4 py-2 bg-gray-300 text-black rounded"
+              className="px-4 py-2 bg-red-600 text-white rounded"
               onClick={closeModal}
             >
               Cancel
@@ -142,10 +142,10 @@ function LectureRow({ lec, index, expandedIndex, toggleLecture }: LectureRowProp
         className="flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
         onClick={() => toggleLecture(index)}
       >
-        <span className="font-medium text-lg">
+        <span className="font-medium text-lg text-black">
           Lecture {lec.number}: {lec.title}
         </span>
-        {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+        {isOpen ? <ChevronUp className="w-5 h-5 text-black" /> : <ChevronDown className="w-5 h-5 text-black" />}
       </div>
       {/* Expanded Content */}
       {isOpen && (
@@ -153,17 +153,17 @@ function LectureRow({ lec, index, expandedIndex, toggleLecture }: LectureRowProp
           {/* Left content */}
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-lg">
-              <FileText className="w-5 h-5" />
-              <span>{lec.title} PDF</span>
+              <FileText className="w-5 h-5 text-black" />
+              <span className="text-black">{lec.title} PDF</span>
             </div>
-            <Download className="w-6 h-6 cursor-pointer" />
+            <Download className="w-6 h-6 text-black  cursor-pointer" />
           </div>
           {/* Right Buttons */}
           <div className="flex gap-4">
-            <button className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
+            <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
               <FileText className="w-5 h-5" /> Upload note
             </button>
-            <button className="px-4 py-2 bg-purple-600 text-white rounded-lg flex items-center gap-2">
+            <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
               <PlusCircle className="w-5 h-5" /> Create quiz
             </button>
           </div>

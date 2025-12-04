@@ -28,42 +28,43 @@ export default function CreateLectureModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+    <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+  <div className="bg-[#EDEBFF] p-6 rounded-lg shadow-lg w-80 border border-black">
 
-        <h2 className="text-xl font-semibold mb-4">Create Lecture</h2>
+    <h2 className="text-xl font-semibold mb-4 text-black">Create Lecture</h2>
 
-        <input
-          className="border w-full p-2 rounded mb-3"
-          placeholder="Lecture Number"
-          value={lectureNumber}
-          onChange={(e) => setLectureNumber(e.target.value)}
-        />
+    <input
+      className="border border-black w-full p-2 rounded mb-3 text-black bg-white"
+      placeholder="Lecture Number"
+      value={lectureNumber}
+      onChange={(e) => setLectureNumber(e.target.value)}
+    />
 
-        <input
-          className="border w-full p-2 rounded mb-3"
-          placeholder="Lecture Name"
-          value={lectureName}
-          onChange={(e) => setLectureName(e.target.value)}
-        />
+    <input
+      className="border border-black w-full p-2 rounded mb-3 text-black bg-white"
+      placeholder="Lecture Name"
+      value={lectureName}
+      onChange={(e) => setLectureName(e.target.value)}
+    />
 
-        <div className="flex justify-end gap-3">
-          <button
-            className="px-4 py-2 bg-gray-200 rounded"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
+    <div className="flex justify-end gap-3">
+      <button
+        className="px-4 py-2 bg-red-400 text-black rounded border border-black"
+        onClick={onClose}
+      >
+        Cancel
+      </button>
 
-          <button
-            className="px-4 py-2 bg-purple-600 text-white rounded"
-            onClick={handleSubmit}
-          >
-            Create
-          </button>
-        </div>
-
-      </div>
+      <button
+        className="px-4 py-2 bg-[#5955B3] text-black rounded border border-black"
+        onClick={handleSubmit}
+      >
+        Create
+      </button>
     </div>
+
+  </div>
+</div>
+
   );
 }
