@@ -3,6 +3,10 @@
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { ChevronDown, ChevronUp, FileText, Download, PlusCircle } from "lucide-react";
+import Link from "next/link";
+
+type LectureFile = { name: string; url: string };
+type Lecture = { number: string; title: string; files: LectureFile[] };
 
 export default function Courses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,15 +17,24 @@ export default function Courses() {
   const [lectureNumber, setLectureNumber] = useState("");
   const [lectureTitle, setLectureTitle] = useState("");
 
-  const [lectures, setLectures] = useState([
-    { number: "1", title: "Introduction to the course" },
-    { number: "2", title: "Introduction to prepositions" },
-    { number: "3", title: "History of English" },
+  const [lectures, setLectures] = useState<Lecture[]>([
+    { number: "1", title: "Introduction to the course", files: [] },
+    { number: "2", title: "Introduction to prepositions", files: [] },
+    { number: "3", title: "History of English", files: [] },
   ]);
 
   const toggleLecture = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
   };
+
+  const updateLectureFiles = (index: number, file: LectureFile) => {
+  setLectures(prev => {
+    const updated = [...prev];
+    updated[index].files.push(file);
+    return updated;
+  });
+};
+
 
   return (
     <div className="flex w-full  bg-white">
@@ -47,7 +60,7 @@ export default function Courses() {
               {/* Button */}
               <button
                 onClick={openModal}
-                className="ml-auto flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
+                className="ml-auto flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-lg shadow hover:bg-gray-500 transition"
               >
                 <PlusCircle className="w-4 h-4" />
                 Create lecture
@@ -59,7 +72,7 @@ export default function Courses() {
               <h1 className="text-black font-bold text-xl mb-4">Course content</h1>
 
               {lectures.length === 0 && (
-                <p className="text-gray-500 text-black">No lectures created yet.</p>
+                <p className="text-gray-500">No lectures created yet.</p>
               )}
 
               <div className="divide-y">
@@ -70,6 +83,7 @@ export default function Courses() {
                     lec={lec}
                     expandedIndex={expandedIndex}
                     toggleLecture={toggleLecture}
+                     updateLectureFiles={updateLectureFiles}
                   />
                 ))}
               </div>
@@ -80,8 +94,10 @@ export default function Courses() {
 
       {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div className="fixed inset-0 bg-white bg-opacity-10 flex items-center justify-center z-50">
+          <div className="bg-white p-10 rounded-lg border border-[#5955B3]  w-280 h-80">
+            <h1 className="text-black text-2xl font-bold pb-8">
+              Enter your lecture Number and Title</h1>
             <input
               type="text"
               placeholder="Lecture number"
@@ -97,25 +113,32 @@ export default function Courses() {
               value={lectureTitle}
               onChange={(e) => setLectureTitle(e.target.value)}
             />
-            <button
-              className="px-4 py-2 bg-[#5955B3] text-white rounded mr-2"
-              onClick={() => {
-                if (lectureNumber && lectureTitle) {
-                  setLectures([...lectures, { number: lectureNumber, title: lectureTitle }]);
-                  setLectureNumber("");
-                  setLectureTitle("");
-                  closeModal();
-                }
-              }}
-            >
-              Save
-            </button>
-            <button
-              className="px-4 py-2 bg-red-600 text-white rounded"
-              onClick={closeModal}
-            >
-              Cancel
-            </button>
+            <div className="flex justify-center gap-4 mt-6">
+  <button
+    className="px-6 py-3 bg-[#5955B3] text-white rounded-lg text-base font-semibold"
+    onClick={() => {
+      if (lectureNumber && lectureTitle) {
+        setLectures([
+          ...lectures,
+          { number: lectureNumber, title: lectureTitle, files: [] }
+        ]);
+        setLectureNumber("");
+        setLectureTitle("");
+        closeModal();
+      }
+    }}
+  >
+    Save
+  </button>
+
+  <button
+    className="px-6 py-3 bg-red-600 text-white rounded-lg text-base font-semibold"
+    onClick={closeModal}
+  >
+    Cancel
+  </button>
+</div>
+
           </div>
         </div>
       )}
@@ -127,13 +150,14 @@ export default function Courses() {
    LECTURE ROW COMPONENT
 --------------------------------------------------- */
 interface LectureRowProps {
-  lec: { number: string; title: string };
+  lec: Lecture;
   index: number;
   expandedIndex: number | null;
   toggleLecture: (index: number) => void;
+  updateLectureFiles: (index: number, file: LectureFile) => void;
 }
 
-function LectureRow({ lec, index, expandedIndex, toggleLecture }: LectureRowProps) {
+function LectureRow({ lec, index, expandedIndex, toggleLecture, updateLectureFiles }: LectureRowProps) {
   const isOpen = expandedIndex === index;
   return (
     <div>
@@ -149,26 +173,75 @@ function LectureRow({ lec, index, expandedIndex, toggleLecture }: LectureRowProp
       </div>
       {/* Expanded Content */}
       {isOpen && (
-        <div className="bg-gray-50 p-6 flex justify-between items-start">
-          {/* Left content */}
-          <div className="flex flex-col gap-3">
+  <div className="bg-gray-50 p-6 flex justify-between items-start relative min-h-[180px]">
+
+    {/* LEFT CONTENT */}
+    <div className="flex flex-col gap-4">
+
+      {/* PDF List */}
+      <div className="flex flex-col gap-2">
+
+        {/* If no file uploaded yet */}
+        {(!lec.files || lec.files.length === 0) && (
+          <div className="flex items-center gap-2 text-lg">
+            <FileText className="w-5 h-5 text-black" />
+            <span className="text-black">No notes uploaded yet</span>
+          </div>
+        )}
+
+        {/* If files exist, list them */}
+        {lec.files?.map((file, i: number) => (
+          <div key={i} className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5 text-black" />
-              <span className="text-black">{lec.title} PDF</span>
+              <span className="text-black">{file.name}</span>
             </div>
-            <Download className="w-6 h-6 text-black  cursor-pointer" />
-          </div>
-          {/* Right Buttons */}
-          <div className="flex gap-4">
-            <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
-              <FileText className="w-5 h-5" /> Upload note
-            </button>
-            <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
-              <PlusCircle className="w-5 h-5" /> Create quiz
+
+            <button onClick={() => window.open(file.url, "_blank")}>
+              <Download className="w-6 h-6 text-black cursor-pointer" />
             </button>
           </div>
-        </div>
-      )}
+        ))}
+
+      </div>
+    </div>
+
+    {/* RIGHT SIDE BUTTONS — FIXED AT BOTTOM RIGHT */}
+    <div className="absolute right-6 bottom-6 flex gap-4">
+
+      {/* Upload PDF BUTTON */}
+      <label className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2 cursor-pointer">
+        <FileText className="w-5 h-5" />
+        Upload note
+        <input
+          type="file"
+          accept="application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            const fileData = {
+              name: file.name,
+              url: URL.createObjectURL(file),
+            };
+
+            updateLectureFiles(index, fileData);
+          }}
+        />
+      </label>
+
+      {/* Create Quiz BUTTON */}
+      <Link href='/quiz'>
+      <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
+        <PlusCircle className="w-5 h-5" /> Create quiz
+      </button>
+      </Link>
+    </div>
+
+  </div>
+)}
+
     </div>
   );
 }

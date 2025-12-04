@@ -12,6 +12,7 @@ export default function CourseContent() {
     { number: "1", title: "Introduction to the course" },
     { number: "2", title: "Introduction to prepositions" },
   ]);
+  
 
   const toggleLecture = (index: number) => {
     setExpandedIndex(idx => (idx === index ? null : index));
@@ -20,6 +21,7 @@ export default function CourseContent() {
   const handleCreateLecture = (num: string, name: string) => {
     setLectures(prev => [...prev, { number: num, title: name }]);
   };
+  
 
   return (
     <div className="w-full">

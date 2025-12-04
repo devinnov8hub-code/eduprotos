@@ -28,7 +28,7 @@ export default function CreateLectureModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-10 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
   <div className="bg-[#EDEBFF] p-6 rounded-lg shadow-lg w-80 border border-black">
 
     <h2 className="text-xl font-semibold mb-4 text-black">Create Lecture</h2>
