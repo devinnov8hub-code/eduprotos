@@ -5,45 +5,61 @@ import { User, Mail, BookOpen, Hash } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../assets/logo2.png";
-import { getLecturerById, postCourse } from "../lib/api/courses_api";
+import { postCourse, CreateLecturer } from "../lib/api/courses_api";
+import { useRouter } from "next/navigation";
 
 type FormData = {
+  name: string;
   lecturer_id: string;
   email: string;
   courseTitle: string;
   courseCode: string;
 };
 export default function Form() {
+  const router = useRouter();
+
   const [lecturerId, setLecturerId] = React.useState<string>("");
 
   const [formData, setFormData] = React.useState<FormData>({
+    name: "",
     lecturer_id: "",
     email: "",
     courseTitle: "",
     courseCode: "",
   });
 
-  useEffect(() => {
-    // Fetch or generate lecturer ID here
-    const fetchLecturerId = async () => {
-      // Simulate fetching lecturer ID
-      const id = await getLecturerById(1).then((res) => res.data?.id || "");
+  // useEffect(() => {
+  //   // Fetch or generate lecturer ID here
+  //   const fetchLecturerId = async () => {
+  //     // Simulate fetching lecturer ID
+  //     // const id = await getLecturerById(1).then((res) => res.data?.id || "");
+  //     const profile = await getLecturerById(1); // This must return a UUID, not number 1!
 
-      setLecturerId(id);
-      setFormData((prevData) => ({
-        ...prevData,
-        lecturer_id: id,
-      }));
-    };
+  //     const id = profile.data?.id || "";
 
-    fetchLecturerId();
-  }, []);
+  //     // setLecturerId(id);`
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       lecturer_id: id,
+  //     }));
+  //   };
+
+  //   fetchLecturerId();
+  // }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    const lecturerId = await CreateLecturer(formData.name);
+
     const response = await postCourse({
-      lecturer_id: formData.lecturer_id,
+      lecturer_id: lecturerId,
+      title: formData.courseTitle,
+      code: formData.courseCode,
+    });
+
+    console.log("Sending:", {
+      lecturer_id: lecturerId,
       title: formData.courseTitle,
       code: formData.courseCode,
     });
@@ -52,11 +68,13 @@ export default function Form() {
       console.log("Course added successfully:", response);
 
       setFormData({
+        name: "",
         lecturer_id: "",
         email: "",
         courseTitle: "",
         courseCode: "",
       });
+      router.push("/dashboard");
     }
     if (response.error) {
       console.error("Error adding course:", response.error);
@@ -93,9 +111,9 @@ export default function Form() {
                 type="text"
                 placeholder="Enter Full Name"
                 className="placeholder-[#5955B3] bg-transparent flex-1 text-gray-700 focus:outline-none"
-                value={formData.lecturer_id}
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, lecturer_id: e.target.value })
+                  setFormData({ ...formData, name: e.target.value })
                 }
               />
             </div>
@@ -149,14 +167,13 @@ export default function Form() {
           </div>
 
           {/* BUTTON */}
-          <Link href="/dashboard">
-            <button
-              type="submit"
-              className="mt-4 w-full bg-[#5955B3] text-white py-3 rounded-lg text-lg font-semibold hover:bg-[#4a48a0] transition"
-            >
-              Submit
-            </button>
-          </Link>
+
+          <button
+            type="submit"
+            className="mt-4 w-full bg-[#5955B3] text-white py-3 rounded-lg text-lg font-semibold hover:bg-[#4a48a0] transition"
+          >
+            Submit
+          </button>
         </form>
       </section>
     </div>
