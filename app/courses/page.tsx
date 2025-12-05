@@ -30,14 +30,7 @@ export default function Courses() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [lectureNumber, setLectureNumber] = useState("");
   const [lectureTitle, setLectureTitle] = useState("");
-
   const [lectures, setLectures] = useState<Lecture[]>([]);
-  //   [
-  //   { number: "1", title: "Introduction to the course", files: [] },
-  //   { number: "2", title: "Introduction to prepositions", files: [] },
-  //   { number: "3", title: "History of English", files: [] },
-  // ]
-
 
   const toggleLecture = (index: number) => {
     setExpandedIndex((prev) => (prev === index ? null : index));
@@ -89,77 +82,68 @@ export default function Courses() {
     fetchCourse();
   }, []);
 
-//get course lectures by course id
-useEffect(() => {
-  if (!courses || courses.length === 0) return;
+  //get course lectures by course id
+  useEffect(() => {
+    if (!courses || courses.length === 0) return;
 
-  const courseId = courses[0].id; // first course
-  fetchLectures(courseId);
-}, [courses]);
+    const courseId = courses[0].id; // first course
+    fetchLectures(courseId);
+  }, [courses]);
 
-const fetchLectures = async (courseId: string) => {
-  const { data, error } = await supabase
-    .from("lectures")
-    .select("*")
-    .eq("course_id", courseId)
-    .order("lecture_no", { ascending: true });
+  const fetchLectures = async (courseId: string) => {
+    const { data, error } = await supabase
+      .from("lectures")
+      .select("*")
+      .eq("course_id", courseId)
+      .order("lecture_no", { ascending: true });
 
-  if (error) {
-    console.log("Error fetching lectures:", error.message);
-    return;
-  }
+    if (error) {
+      console.log("Error fetching lectures:", error.message);
+      return;
+    }
 
-  // Ensure files key exists so UI doesn't break
-  const formatted = data.map((lec) => ({
-    ...lec,
-    files: []
-  }));
+    // Ensure files key exists so UI doesn't break
+    const formatted = data.map((lec) => ({
+      ...lec,
+      files: [],
+    }));
 
-  setLectures(formatted);
-};
-
-
-  //add lectures
-const addLecture = async () => {
-  if (!lectureNumber || !lectureTitle) return;
-
-   const courseId = courses[0]?.id;
-  if (!courseId) {
-    console.log("Course ID missing!");
-    return;
-  }
-
-  const newLecture = {
-    lecture_no: Number(lectureNumber),
-    title: lectureTitle,
-    course_id: courseId,
+    setLectures(formatted);
   };
 
-  const { data, error } = await createLecture(newLecture);
+  //add lectures
+  const addLecture = async () => {
+    if (!lectureNumber || !lectureTitle) return;
 
-  if (error) {
-    console.log("Error creating lecture:", error.message);
-    return;
-  }
+    const courseId = courses[0]?.id;
+    if (!courseId) {
+      console.log("Course ID missing!");
+      return;
+    }
 
-  // Update frontend list
-  // setLectures((prev) => [...(prev || []), data[0]]);
+    const newLecture = {
+      lecture_no: Number(lectureNumber),
+      title: lectureTitle,
+      course_id: courseId,
+    };
 
-  setLectures((prev) => [
-    ...prev,
-    { ...data[0], files: [] }
-  ]);
+    const { data, error } = await createLecture(newLecture);
 
-  // console.log("Lecture created:", data);
-  console.log("Lecture created:", data[0]);
+    if (error) {
+      console.log("Error creating lecture:", error.message);
+      return;
+    }
 
-  // reset form
-  setLectureNumber("");
-  setLectureTitle("");
-  closeModal();
-};
+    setLectures((prev) => [...prev, { ...data[0], files: [] }]);
 
+    // console.log("Lecture created:", data);
+    console.log("Lecture created:", data[0]);
 
+    // reset form
+    setLectureNumber("");
+    setLectureTitle("");
+    closeModal();
+  };
 
   return (
     <div className="flex w-full  bg-white">

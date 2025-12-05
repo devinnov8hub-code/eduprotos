@@ -11,7 +11,6 @@ export const getCourses = async () => {
   return { data, error };
 };
 
-
 export async function CreateLecturer(name: string) {
   // Check if a profile already exists
   let { data: existing } = await supabase
@@ -51,7 +50,6 @@ export const getCoursesByLecturerId = async () => {
   return { data, error };
 };
 
-
 export const postCourse = async (course: {
   title: string;
   code: string;
@@ -69,33 +67,31 @@ export const postCourse = async (course: {
 };
 
 // getLectures api
-export const getlectures = async()=>{
-  const {data, error} = await supabase
-  .from('lectures')
-  .select('*');
-  return{ data, error}
-}
+export const getlectures = async () => {
+  const { data, error } = await supabase.from("lectures").select("*");
+  return { data, error };
+};
 
 //create lecture api
-export const createLecture = async(lecture:{
+export const createLecture = async (lecture: {
   lecture_no: number;
   title: string;
   quiz?: string;
   course_id?: string;
-})=>{
-  const {data, error} = await supabase
-  .from('lectures')
-  .insert([
-    {
-      lecture_no: lecture.lecture_no,
-      title: lecture.title,
-      course_id: lecture.course_id,
-    }
-  ])
-  .select()
-  .single();
-  return {data, error};
-}
+}) => {
+  const { data, error } = await supabase
+    .from("lectures")
+    .insert([
+      {
+        lecture_no: lecture.lecture_no,
+        title: lecture.title,
+        course_id: lecture.course_id,
+      },
+    ])
+    .select()
+    .single();
+  return { data, error };
+};
 
 //delete course api
 export const deleteCourse = async (courseId: number) => {

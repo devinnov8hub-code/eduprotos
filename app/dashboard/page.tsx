@@ -1,74 +1,67 @@
-
 import Sidebar from "../components/Sidebar";
 import Calendar from "../components/Calender";
 import StatsCards from "../components/StatsCard";
 import DummyStats from "../components/DummyStats";
-import RecentNotes from '../components/RecentNotes';
+import RecentNotes from "../components/RecentNotes";
 import Image from "next/image";
 import { register } from "../lib/api/auth";
 import { getCurrentUser } from "../lib/api/auth";
 
 import cartoon from "../assets/images/Group 5.png";
 type DashboardProps = {
-  name: ()=> void | string;
+  name: () => void | string;
 };
 
 const getUserName = async () => {
   const user = await getCurrentUser();
   return user?.user_metadata.full_name || "Lecturer";
-}
+};
 
 export default function Dashboard({ name }: DashboardProps) {
   return (
     <div className="flex w-full ml-1/8  bg-white">
       <Sidebar />
-      
+
       <section className="flex flex-col w-full ml-10">
-      
         <h1 className="text-3xl font-bold mb-6 mt-4 text-black">Dashboard</h1>
         <main className="bg-gray-50 min-h-screen p-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* LEFT COLUMN — HERO, STATS CARDS, BAR + CIRCULAR */}
+          <section className="flex flex-col gap-6 col-span-1 xl:col-span-2">
+            {/* HERO */}
+            <div className="box-1 h-50 flex flex-col md:flex-row items-center justify-between bg-white rounded-lg p-6 shadow">
+              <div>
+                <h1 className="text-2xl font-bold text-black">
+                  Hello {getUserName()}!
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Here are your teaching tools for today.
+                </p>
+              </div>
+              <Image
+                src={cartoon}
+                alt="dashboard"
+                className="w-66 object-contain"
+              />
+            </div>
 
-       {/* LEFT COLUMN — HERO, STATS CARDS, BAR + CIRCULAR */}
-      <section className="flex flex-col gap-6 col-span-1 xl:col-span-2">
+            {/* SMALL STATS */}
+            <StatsCards />
 
-        {/* HERO */}
-        <div className="box-1 h-50 flex flex-col md:flex-row items-center justify-between bg-white rounded-lg p-6 shadow">
-          <div>
-            <h1 className="text-2xl font-bold text-black">
-              Hello {getUserName()}!
-              
-            </h1>
-            <p className="text-sm text-gray-500">
-              Here are your teaching tools for today.
-            </p>
-          </div>
-          <Image
-            src={cartoon}
-            alt="dashboard"
-            className="w-66 object-contain"
-          />
-        </div>
+            {/* DUMMY STATS (Bar Chart + Circular Charts together) */}
+            <div className=" rounded-lg ">
+              <DummyStats />
+            </div>
+          </section>
+          {/* RIGHT COLUMN — CALENDAR + RECENT NOTES */}
 
-        {/* SMALL STATS */}
-        <StatsCards />
-
-        {/* DUMMY STATS (Bar Chart + Circular Charts together) */}
-        <div className=" rounded-lg ">
-          <DummyStats />
-        </div>
-      </section>
-{/* RIGHT COLUMN — CALENDAR + RECENT NOTES */}
-
-
-        <section className="flex flex-col gap-6">
-           <div className="">
-            <Calendar />
-           </div>
-          <div  className="">
-            <RecentNotes />
-          </div>
-         
-        </section>
+          <section className="flex flex-col gap-6">
+            <div className="">
+              <Calendar />
+            </div>
+            <div className="">
+              <RecentNotes />
+            </div>
+          </section>
         </main>
       </section>
     </div>
