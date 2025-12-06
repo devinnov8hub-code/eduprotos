@@ -11,27 +11,30 @@ export const getCourses = async () => {
   return { data, error };
 };
 
-export async function CreateLecturer(name: string) {
-  // Check if a profile already exists
-  let { data: existing } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("full_name", name)
-    .single();
+// We used authentication instead of this function to create lecturer profiles
+// ---------------------------------------------------------------------------
+// export async function CreateLecturer(name: string) {
+//   // Check if a profile already exists
+//   let { data: existing } = await supabase
+//     .from("profiles")
+//     .select("*")
+//     .eq("full_name", name)
+//     .single();
 
-  if (existing) return existing.id;
+//   if (existing) return existing.id;
 
-  // If not found, create a new lecturer
-  const { data: newProfile, error } = await supabase
-    .from("profiles")
-    .insert([{ full_name: name }])
-    .select()
-    .single();
+//   // If not found, create a new lecturer
+//   const { data: newProfile, error } = await supabase
+//     .from("profiles")
+//     .insert([{ full_name: name }])
+//     .select()
+//     .single();
 
-  if (error) throw error;
+//   if (error) throw error;
 
-  return newProfile.id;
-}
+//   return newProfile.id;
+// }
+// ---------------------------------------------------------------------------
 
 // Get courses for the logged-in lecturer
 export const getCoursesByLecturerId = async () => {
@@ -78,6 +81,7 @@ export const createLecture = async (lecture: {
   title: string;
   quiz?: string;
   course_id?: string;
+  file_path?: string;
 }) => {
   const { data, error } = await supabase
     .from("lectures")
@@ -86,9 +90,10 @@ export const createLecture = async (lecture: {
         lecture_no: lecture.lecture_no,
         title: lecture.title,
         course_id: lecture.course_id,
+        file_path: lecture.file_path,
       },
     ])
-    .select()
+    .select("*")
     .single();
   return { data, error };
 };
@@ -99,5 +104,48 @@ export const deleteCourse = async (courseId: number) => {
     .from("courses")
     .delete()
     .eq("id", courseId);
+  return { data, error };
+};
+
+//Post uploaded lecture files api
+export const uploadLectureFiles = async (lectureFile: {
+  file: File;
+  lecture_id: string;
+}) => {
+  const filePath = `lectures/${lectureFile.lecture_id}/${lectureFile.file.name}`;
+
+  // Upload file to Supabase Storage
+  const { data: storageData, error: storageError } = await supabase.storage
+    .from("eduprotos_bucket")
+    .upload(filePath, lectureFile.file, { upsert: true });
+
+  if (storageError) {
+    return { data: null, error: storageError };
+  }
+
+  //Get public URL of the uploaded file
+  const { data: publicUrlData } = supabase.storage
+    .from("eduprotos_bucket")
+    .getPublicUrl(filePath);
+
+  // Insert file metadata into the database
+  const { data, error } = await supabase
+    .from("lecture_files")
+    .insert([
+      {
+        file_name: lectureFile.file.name,
+        file_url: publicUrlData.publicUrl,
+        lecture_id: lectureFile.lecture_id,
+      },
+    ])
+    .select();
+
+  if (error) console.log(" DB INSERT ERROR:", error);
+
+  console.log("STORAGE PATH:", filePath);
+  console.log("STORAGE ERROR:", storageError);
+  console.log("PUBLIC URL:", publicUrlData);
+  console.log("DB ERROR:", error);
+
   return { data, error };
 };

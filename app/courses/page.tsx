@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { createLecture } from "../lib/api/courses_api";
+import { uploadLectureFiles } from "../lib/api/courses_api";
 
 type LectureFile = { name: string; url: string };
 type Lecture = {
@@ -93,7 +94,12 @@ export default function Courses() {
   const fetchLectures = async (courseId: string) => {
     const { data, error } = await supabase
       .from("lectures")
-      .select("*")
+      .select(
+        `
+           *,
+          lecture_files (id, file_name, file_url)
+        `
+      )
       .eq("course_id", courseId)
       .order("lecture_no", { ascending: true });
 
@@ -101,14 +107,27 @@ export default function Courses() {
       console.log("Error fetching lectures:", error.message);
       return;
     }
+    // Fetch lecture files for all lectures
+    const lectureIds = data.map((lec) => lec.id);
 
-    // Ensure files key exists so UI doesn't break
-    const formatted = data.map((lec) => ({
+    const { data: filesData, error: filesError } = await supabase
+      .from("lecture_files")
+      .select("*")
+      .in("lecture_id", lectureIds);
+
+    if (filesError) {
+      console.log("Error fetching lecture files:", filesError.message);
+    }
+
+    // Map files to each lecture
+    const lecturesWithFiles = data.map((lec) => ({
       ...lec,
-      files: [],
+      files: filesData
+        ? filesData.filter((file) => file.lecture_id === lec.id)
+        : [],
     }));
 
-    setLectures(formatted);
+    setLectures(lecturesWithFiles);
   };
 
   //add lectures
@@ -330,16 +349,31 @@ function LectureRow({
                 type="file"
                 accept="application/pdf"
                 className="hidden"
-                onChange={(e) => {
+                onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
 
-                  const fileData = {
-                    name: file.name,
-                    url: URL.createObjectURL(file),
+                  if (!lec.id) {
+                    console.log("No lecture ID found");
+                    return;
+                  }
+
+                  const { data, error } = await uploadLectureFiles({
+                    file,
+                    lecture_id: lec.id,
+                  });
+
+                  if (error) {
+                    console.log("File upload error:", error.message);
+                    return;
+                  }
+
+                  const filesData = {
+                    name: data?.[0].file_name,
+                    url: data?.[0].file_url,
                   };
 
-                  updateLectureFiles(index, fileData);
+                  updateLectureFiles(index, filesData);
                 }}
               />
             </label>
