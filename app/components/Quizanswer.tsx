@@ -9,7 +9,7 @@ import { Trash2, PlusCircle } from "lucide-react";
 export interface QuestionType {
   id: string;                                      // UNIQUE ID REQUIRED
   title: string;
-  type: "multiple-choice" | "short-answer";
+  type: "multiple_choice" | "short_answer";
   options: string[];
   shortAnswer: string;
 }
@@ -39,8 +39,8 @@ export default function QuestionEditor({
   // LOCAL STATE (never resets because we store stable values)
   // ---------------------------------------------------------
   const [title, setTitle] = useState(question?.title ?? "");
-  const [type, setType] = useState<"multiple-choice" | "short-answer">(
-    question?.type ?? "multiple-choice"
+  const [type, setType] = useState<"multiple_choice" | "short_answer">(
+    question?.type ?? "multiple_choice"
   );
   const [options, setOptions] = useState<string[]>(
     question?.options ?? ["Option 1", "Option 2"]
@@ -137,7 +137,7 @@ export default function QuestionEditor({
 
 
       {/* MULTIPLE CHOICE VIEW */}
-      {type === "multiple-choice" ? (
+      {type === "multiple_choice" ? (
         <div className="flex flex-col gap-3 mb-4">
           {options.map((opt, i) => (
             <div key={i} className="flex items-center gap-3">
@@ -195,11 +195,11 @@ export default function QuestionEditor({
           className="text-sm border border-gray-300 rounded px-3 py-2 bg-white text-gray-700 focus:outline-none focus:border-purple-500 w-full sm:w-auto"
           value={type}
           onChange={(e) =>
-            setType(e.target.value as "multiple-choice" | "short-answer")
+            setType(e.target.value as "multiple_choice" | "short_answer")
           }
         >
-          <option value="multiple-choice">Multiple Choice</option>
-          <option value="short-answer">Short Answer</option>
+          <option value="multiple_choice">Multiple Choice</option>
+          <option value="short_answer">Short Answer</option>
         </select>
 
         {/* REQUIRED TOGGLE */}

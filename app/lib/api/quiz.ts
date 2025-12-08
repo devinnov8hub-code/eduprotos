@@ -55,7 +55,7 @@ export async function createQuestion(
   quizId: string,
   question: string,
   position: number,
-   type: "multiple-choice" | "short-answer"
+   type: "multiple_choice" | "short_answer"
 ) {
   const { data, error } = await supabase
     .from("quiz_questions")

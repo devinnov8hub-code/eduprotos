@@ -1,3 +1,5 @@
+"use client"
+
 import Sidebar from "../components/Sidebar";
 import Calendar from "../components/Calender";
 import StatsCards from "../components/StatsCard";

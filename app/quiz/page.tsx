@@ -26,7 +26,7 @@ export default function Quiz() {
     const newQuestion: Question = {
       id: crypto.randomUUID(),
       title: "",
-      type: "multiple-choice",
+      type: "multiple_choice", 
       options: ["Option 1", "Option 2", "Option 3", "Option 4"],
       shortAnswer: "",
     };
@@ -104,7 +104,7 @@ export default function Quiz() {
     const q = questions[i];
 
     // Validate question type
-    if (q.type !== "multiple-choice" && q.type !== "short-answer") {
+    if (q.type !== "multiple_choice" && q.type !== "short_answer") {
       console.error(`Invalid question type at index ${i}:`, q.type);
       continue; // skip invalid question
     }
@@ -129,8 +129,9 @@ export default function Quiz() {
 
     const questionId = savedQuestion.id;
 
-    // 3️⃣ Save options for multiple-choice questions
-    if (q.type === "multiple-choice" && q.options?.length > 0) {
+    // 3️⃣ Save options for multiple-
+    // _choice questions
+    if (q.type === "multiple_choice" && q.options?.length > 0) {
       for (let j = 0; j < q.options.length; j++) {
         const opt = q.options[j];
         const correct = selectedAnswer[i] === opt;
@@ -196,7 +197,7 @@ export default function Quiz() {
                   />
 
                   {/* Answer Selection */}
-                  {currentQuestion.type === "multiple-choice" && (
+                  {currentQuestion.type === "multiple_choice" && (
                     <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Answer
