@@ -13,6 +13,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { createLecture } from "../lib/api/courses_api";
 import { uploadLectureFiles } from "../lib/api/courses_api";
+import LectureQuizzes from "../components/LectureQuizzes";
 
 type LectureFile = { name: string; url: string };
 type Lecture = {
@@ -339,6 +340,10 @@ function LectureRow({
             </div>
           </div>
 
+          {/* list quiz for each lecture */}
+          <div>
+            <LectureQuizzes lecture_id={lec.id} />
+          </div>
           {/* RIGHT SIDE BUTTONS — FIXED AT BOTTOM RIGHT */}
           <div className="absolute right-6 bottom-6 flex gap-4">
             {/* Upload PDF BUTTON */}

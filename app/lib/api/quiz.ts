@@ -52,13 +52,14 @@ export const createQuiz = async (quizName: string, lecture_id: string) => {
 
 //create question
 export async function createQuestion(
-  quizId: number,
+  quizId: string,
   question: string,
-  position: number
+  position: number,
+   type: "multiple-choice" | "short-answer"
 ) {
   const { data, error } = await supabase
     .from("quiz_questions")
-    .insert([{ quiz_id: quizId, question, position }])
+    .insert([{ quiz_id: quizId, question, position, type}])
     .select()
     .single();
 
@@ -67,7 +68,7 @@ export async function createQuestion(
 
 //create option
 export async function createOption(
-  questionId: number,
+  questionId: string,
   option_text: string,
   is_correct: boolean,
   position: number
@@ -118,3 +119,15 @@ export async function deleteQuiz(quizId: number) {
 
   return { error };
 }
+
+// Get all quizzes for a given lecture
+export async function getQuizzesByLecture(lecture_id: string) {
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("lecture_id", lecture_id)
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+}
+

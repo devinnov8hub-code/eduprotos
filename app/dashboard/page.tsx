@@ -6,18 +6,24 @@ import RecentNotes from "../components/RecentNotes";
 import Image from "next/image";
 import { register } from "../lib/api/auth";
 import { getCurrentUser } from "../lib/api/auth";
+import { useState, useEffect } from "react";
 
 import cartoon from "../assets/images/Group 5.png";
 type DashboardProps = {
   name: () => void | string;
 };
 
-const getUserName = async () => {
-  const user = await getCurrentUser();
-  return user?.user_metadata.full_name || "Lecturer";
-};
-
 export default function Dashboard({ name }: DashboardProps) {
+  const [userName, setUserName] = useState<string>("Lecturer");
+
+  useEffect(() => {
+    async function fetchUser() {
+      const user = await getCurrentUser();
+      setUserName(user?.user_metadata.full_name || "Lecturer");
+    }
+
+    fetchUser();
+  }, []);
   return (
     <div className="flex w-full ml-1/8  bg-white">
       <Sidebar />
@@ -31,7 +37,7 @@ export default function Dashboard({ name }: DashboardProps) {
             <div className="box-1 h-50 flex flex-col md:flex-row items-center justify-between bg-white rounded-lg p-6 shadow">
               <div>
                 <h1 className="text-2xl font-bold text-black">
-                  Hello {getUserName()}!
+                  Hello {userName} !
                 </h1>
                 <p className="text-sm text-gray-500">
                   Here are your teaching tools for today.
