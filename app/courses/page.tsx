@@ -14,6 +14,7 @@ import { supabase } from "../lib/supabaseClient";
 import { createLecture } from "../lib/api/courses_api";
 import { uploadLectureFiles } from "../lib/api/courses_api";
 import LectureQuizzes from "../components/LectureQuizzes";
+import { toast, ToastContainer } from "react-toastify";
 
 type LectureFile = { name: string; url: string };
 type Lecture = {
@@ -133,11 +134,14 @@ export default function Courses() {
 
   //add lectures
   const addLecture = async () => {
-    if (!lectureNumber || !lectureTitle) return;
+    if (!lectureNumber || !lectureTitle) {
+      toast.error("Please fill in both lecture number and title");
+      return;
+    }
 
     const courseId = courses[0]?.id;
     if (!courseId) {
-      console.log("Course ID missing!");
+      toast.error("Course ID missing!");
       return;
     }
 
@@ -151,12 +155,13 @@ export default function Courses() {
 
     if (error) {
       console.log("Error creating lecture:", error.message);
+      toast.error("Error creating lecture: " + error.message);
       return;
     }
 
     setLectures((prev) => [...prev, { ...data[0], files: [] }]);
 
-    // console.log("Lecture created:", data);
+    toast.success("Lecture created successfully!");
     console.log("Lecture created:", data[0]);
 
     // reset form
@@ -166,10 +171,11 @@ export default function Courses() {
   };
 
   return (
-    <div className="flex w-full  bg-white">
+    <div className="flex w-full bg-white">
       <Sidebar />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-      <section className="flex flex-col w-full xl:pl-10 xl:pr-10 pl-4 pr-4">
+      <section className="flex flex-col w-full lg:ml-0 xl:pl-10 xl:pr-10 pl-4 pr-4 pt-16 lg:pt-4">
         <h1 className="text-3xl font-bold mb-6 mt-4 text-black">Courses</h1>
 
         <main className="bg-gray-50 min-h-screen p-6 w-full">
@@ -219,6 +225,10 @@ export default function Courses() {
                     expandedIndex={expandedIndex}
                     toggleLecture={toggleLecture}
                     updateLectureFiles={updateLectureFiles}
+                    onRefetch={() => {
+                      const courseId = courses[0]?.id;
+                      if (courseId) fetchLectures(courseId);
+                    }}
                   />
                 ))}
               </div>
@@ -288,8 +298,11 @@ function LectureRow({
   expandedIndex,
   toggleLecture,
   updateLectureFiles,
-}: LectureRowProps) {
+  onRefetch,
+}: LectureRowProps & { onRefetch: () => void }) {
   const isOpen = expandedIndex === index;
+  const [uploading, setUploading] = useState(false);
+
   return (
     <div>
       {/* Collapsed Row */}
@@ -308,9 +321,9 @@ function LectureRow({
       </div>
       {/* Expanded Content */}
       {isOpen && (
-        <div className="bg-gray-50 p-6 flex justify-between items-start relative min-h-[180px]">
+        <div className="bg-gray-50 p-6 flex flex-col lg:flex-row justify-between items-start relative min-h-[180px] gap-4">
           {/* LEFT CONTENT */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 flex-1">
             {/* PDF List */}
             <div className="flex flex-col gap-2">
               {/* If no file uploaded yet */}
@@ -322,17 +335,17 @@ function LectureRow({
               )}
 
               {/* If files exist, list them */}
-              {lec.files?.map((file, i: number) => (
+              {lec.files?.map((file: any, i: number) => (
                 <div
                   key={i}
                   className="flex items-center justify-between w-full"
                 >
                   <div className="flex items-center gap-2 text-lg">
                     <FileText className="w-5 h-5 text-black" />
-                    <span className="text-black">{file.name}</span>
+                    <span className="text-black">{file.name || file.file_name}</span>
                   </div>
 
-                  <button onClick={() => window.open(file.url, "_blank")}>
+                  <button onClick={() => window.open(file.url || file.file_url, "_blank")}>
                     <Download className="w-6 h-6 text-black cursor-pointer" />
                   </button>
                 </div>
@@ -341,44 +354,62 @@ function LectureRow({
           </div>
 
           {/* list quiz for each lecture */}
-          <div>
+          <div className="w-full lg:w-auto">
             <LectureQuizzes lecture_id={lec.id} />
           </div>
           {/* RIGHT SIDE BUTTONS — FIXED AT BOTTOM RIGHT */}
-          <div className="absolute right-6 bottom-6 flex gap-4">
+          <div className="absolute right-6 bottom-6 flex flex-col sm:flex-row gap-4">
             {/* Upload PDF BUTTON */}
-            <label className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2 cursor-pointer">
+            <label className={`px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2 cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
               <FileText className="w-5 h-5" />
-              Upload note
+              {uploading ? 'Uploading...' : 'Upload note'}
               <input
                 type="file"
                 accept="application/pdf"
                 className="hidden"
+                disabled={uploading}
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
 
                   if (!lec.id) {
-                    console.log("No lecture ID found");
+                    toast.error("No lecture ID found");
                     return;
                   }
 
-                  const { data, error } = await uploadLectureFiles({
-                    file,
-                    lecture_id: lec.id,
-                  });
+                  setUploading(true);
+                  
+                  try {
+                    const { data, error } = await uploadLectureFiles({
+                      file,
+                      lecture_id: lec.id,
+                    });
 
-                  if (error) {
-                    console.log("File upload error:", error.message);
-                    return;
+                    if (error) {
+                      console.error("File upload error:", error);
+                      toast.error("Error uploading file: " + error.message);
+                      setUploading(false);
+                      return;
+                    }
+
+                    if (!data || data.length === 0) {
+                      toast.error("File uploaded but failed to save to database");
+                      setUploading(false);
+                      return;
+                    }
+
+                    toast.success("File uploaded successfully!");
+                    
+                    // Refetch lectures to get updated file list
+                    onRefetch();
+                  } catch (err) {
+                    console.error("Upload error:", err);
+                    toast.error("An error occurred during upload");
+                  } finally {
+                    setUploading(false);
+                    // Reset input
+                    e.target.value = '';
                   }
-
-                  const filesData = {
-                    name: data?.[0].file_name,
-                    url: data?.[0].file_url,
-                  };
-
-                  updateLectureFiles(index, filesData);
                 }}
               />
             </label>
@@ -390,7 +421,7 @@ function LectureRow({
                 query: { lecture_id: lec.id }, // pass lecture_id via query
               }}
             >
-              <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2">
+              <button className="px-4 py-2 bg-[#5955B3] text-white rounded-lg flex items-center gap-2 whitespace-nowrap">
                 <PlusCircle className="w-5 h-5" /> Create quiz
               </button>
             </Link>

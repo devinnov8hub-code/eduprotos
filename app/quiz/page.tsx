@@ -9,6 +9,7 @@ import { Question } from "@/types";
 import Link from "next/link";
 import { createQuestion, createQuiz, createOption } from "../lib/api/quiz";
 import { useParams, useSearchParams } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Quiz() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -79,12 +80,12 @@ export default function Quiz() {
   //handle create quiz
  const handleCreateQuiz = async () => {
   if (!quizName.trim()) {
-    alert("Quiz name is required!");
+    toast.error("Quiz name is required!");
     return;
   }
 
   if (!lecture_id) {
-    alert("Lecture ID missing — quiz must belong to a lecture");
+    toast.error("Lecture ID missing — quiz must belong to a lecture");
     return;
   }
 
@@ -92,7 +93,7 @@ export default function Quiz() {
   const { data: quiz, error: quizError } = await createQuiz(quizName, lecture_id);
   if (quizError || !quiz) {
     console.error("Quiz Error:", quizError);
-    alert("Error creating quiz");
+    toast.error("Error creating quiz");
     return;
   }
 
@@ -150,15 +151,16 @@ export default function Quiz() {
     }
   }
 
-  alert("Quiz created successfully!");
+  toast.success("Quiz created successfully!");
 };
 
 
   return (
     <div className="flex w-full bg-white min-h-screen">
       <Sidebar />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-      <section className="flex flex-col w-full xl:pl-10 xl:pr-10 pl-4 pr-4 pb-6">
+      <section className="flex flex-col w-full lg:ml-0 xl:pl-10 xl:pr-10 pl-4 pr-4 pb-6 pt-16 lg:pt-4">
         {/* HEADER */}
         <div className="flex items-center gap-2 mt-4 mb-4">
           <Link href="/courses">

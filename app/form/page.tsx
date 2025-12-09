@@ -7,6 +7,7 @@ import logo from "../assets/logo2.png";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { register } from "../lib/api/auth";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function Form() {
   const router = useRouter();
@@ -39,7 +40,7 @@ export default function Form() {
 
     if (signUpError) {
       console.error("Signup error:", signUpError);
-      alert(signUpError.message);
+      toast.error(signUpError.message);
       return;
     }
 
@@ -52,13 +53,13 @@ export default function Form() {
 
     if (signInError) {
       console.error("Sign-in error:", signInError);
-      alert(signInError.message);
+      toast.error(signInError.message);
       return;
     }
 
     const user = signInData.user;
     if (!user) {
-      alert("Could not log in user after signup.");
+      toast.error("Could not log in user after signup.");
       return;
     }
 
@@ -73,7 +74,7 @@ export default function Form() {
 
     if (profileError) {
       console.error("Profile insert error:", profileError);
-      alert(profileError.message);
+      toast.error(profileError.message);
       return;
     }
 
@@ -88,9 +89,11 @@ export default function Form() {
 
     if (courseError) {
       console.error("Course insert error:", courseError);
-      alert(courseError.message);
+      toast.error(courseError.message);
       return;
     }
+
+    toast.success("Registration successful! Redirecting...");
 
     // 5️⃣ Navigate to dashboard
     router.push("/dashboard");
@@ -98,6 +101,7 @@ export default function Form() {
 
   return (
     <div className="w-full h-screen bg-[#5955B3] flex items-center justify-center p-4">
+      <ToastContainer position="top-right" autoClose={3000} />
       <section className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-10">
         <Image
           src={logo}

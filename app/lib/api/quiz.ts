@@ -14,7 +14,7 @@ export const getQuiz = async () => {
 };
 
 //get quiz by id
-export async function getQuizById(quizId: number) {
+export async function getQuizById(quizId: string) {
   const { data, error } = await supabase
     .from("quizzes")
     .select(

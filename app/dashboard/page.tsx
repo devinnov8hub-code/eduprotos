@@ -27,10 +27,10 @@ export default function Dashboard({ name }: DashboardProps) {
     fetchUser();
   }, []);
   return (
-    <div className="flex w-full ml-1/8  bg-white">
+    <div className="flex w-full bg-white">
       <Sidebar />
 
-      <section className="flex flex-col w-full ml-10">
+      <section className="flex flex-col w-full lg:ml-0 xl:pl-10 xl:pr-10 pl-4 pr-4 pt-16 lg:pt-4">
         <h1 className="text-3xl font-bold mb-6 mt-4 text-black">Dashboard</h1>
         <main className="bg-gray-50 min-h-screen p-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* LEFT COLUMN — HERO, STATS CARDS, BAR + CIRCULAR */}
