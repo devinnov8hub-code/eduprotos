@@ -21,7 +21,6 @@ export default function SplashScreen() {
     <div className="flex w-full h-screen bg-zinc-50 font-sans items-center justify-center">
       <Image src={splash} alt="logo" fill className="object-cover" priority />
 
-
 {/**loader part */}
 <div className="absolute bottom-50 flex justify-center w-full">
         <div className="loader"></div>
