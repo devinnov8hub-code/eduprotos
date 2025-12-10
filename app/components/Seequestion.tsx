@@ -56,7 +56,7 @@ export default function QuestionPreview({
           </div>
 
           {/* MULTIPLE CHOICE PREVIEW */}
-          {q.type === "multiple-choice" && (
+          {q.type === "multiple_choice" && (
             <div className="flex flex-col gap-2 ml-2">
               {q.options.map((opt, i) => (
                 <label 
@@ -77,7 +77,7 @@ export default function QuestionPreview({
           )}
 
           {/* SHORT ANSWER PREVIEW */}
-          {q.type === "short-answer" && (
+          {q.type === "short_answer" && (
             <div className="ml-2">
               <input
                 type="text"
