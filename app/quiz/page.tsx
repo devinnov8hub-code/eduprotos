@@ -8,10 +8,10 @@ import QuestionPreview from "../components/Seequestion";
 import { Question } from "@/types";
 import Link from "next/link";
 import { createQuestion, createQuiz, createOption } from "../lib/api/quiz";
-import { useParams, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 
-export default function Quiz() {
+function Quiz() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [quizName, setQuizName] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number | null>(null);
@@ -153,173 +153,171 @@ export default function Quiz() {
 
   toast.success("Quiz created successfully!");
 };
-
-
   return (
-    <Suspense fallback={<Loading/>}>
-      <div className="flex w-full bg-white min-h-screen">
-        <Sidebar />
-        <ToastContainer position="top-right" autoClose={3000} />
+    <div className="flex w-full bg-white min-h-screen">
+      <Sidebar />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-        <section className="flex flex-col w-full lg:ml-0 xl:pl-10 xl:pr-10 pl-4 pr-4 pb-6 pt-16 lg:pt-4">
-          {/* HEADER */}
-          <div className="flex items-center gap-2 mt-4 mb-4">
-            <Link href="/courses">
-              <ArrowBigLeft className="w-5 h-5 text-black cursor-pointer hover:text-gray-600 transition" />
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Quiz Generator</h1>
-          </div>
+      <section className="flex flex-col w-full lg:ml-0 xl:pl-10 xl:pr-10 pl-4 pr-4 pb-6 pt-16 lg:pt-4">
+        {/* HEADER */}
+        <div className="flex items-center gap-2 mt-4 mb-4">
+          <Link href="/courses">
+            <ArrowBigLeft className="w-5 h-5 text-black cursor-pointer hover:text-gray-600 transition" />
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Quiz Generator</h1>
+        </div>
 
-          <main className="bg-gray-50 min-h-[calc(100vh-120px)] w-full rounded-lg">
-            {/* QUIZ CONTAINER - Responsive Layout */}
-            <div className="flex flex-col lg:flex-row gap-6 w-full p-4 lg:p-6">
-              {/* LEFT SIDE: QUESTION EDITOR */}
-              <div className="w-96  flex flex-col gap-4 h-[calc(100vh-220px)] overflow-y-auto pr-3">
-                {/* Quiz Name Input */}
-                <input
-                  type="text"
-                  placeholder="Quiz Name"
-                  value={quizName}
-                  onChange={(e) => setQuizName(e.target.value)}
-                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 text-sm"
-                />
+        <main className="bg-gray-50 min-h-[calc(100vh-120px)] w-full rounded-lg">
+          {/* QUIZ CONTAINER - Responsive Layout */}
+          <div className="flex flex-col lg:flex-row gap-6 w-full p-4 lg:p-6">
+            {/* LEFT SIDE: QUESTION EDITOR */}
+            <div className="w-96  flex flex-col gap-4 h-[calc(100vh-220px)] overflow-y-auto pr-3">
+              {/* Quiz Name Input */}
+              <input
+                type="text"
+                placeholder="Quiz Name"
+                value={quizName}
+                onChange={(e) => setQuizName(e.target.value)}
+                className="w-full bg-white border border-gray-300 rounded-md px-4 py-2.5 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200 text-sm"
+              />
 
-                {/* Question Editor Section */}
-                {currentQuestion ? (
-                  <div className="flex flex-col gap-4">
-                    <QuestionEditor
-                      key={currentQuestion.id}
-                      question={currentQuestion}
-                      index={currentQuestionIndex!}
-                      onChange={(updated) =>
-                        updateQuestion(currentQuestionIndex!, updated)
-                      }
-                      onDelete={() => deleteQuestion(currentQuestionIndex!)}
-                      onCreate={addQuestion}
-                      showCreateButton={false}
-                    />
+              {/* Question Editor Section */}
+              {currentQuestion ? (
+                <div className="flex flex-col gap-4">
+                  <QuestionEditor
+                    key={currentQuestion.id}
+                    question={currentQuestion}
+                    index={currentQuestionIndex!}
+                    onChange={(updated) =>
+                      updateQuestion(currentQuestionIndex!, updated)
+                    }
+                    onDelete={() => deleteQuestion(currentQuestionIndex!)}
+                    onCreate={addQuestion}
+                    showCreateButton={false}
+                  />
 
-                    {/* Answer Selection */}
-                    {currentQuestion.type === "multiple_choice" && (
-                      <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Answer
-                        </label>
-                        <select
-                          value={selectedAnswer[currentQuestionIndex!] || ""}
-                          onChange={(e) =>
-                            setSelectedAnswer((prev) => ({
-                              ...prev,
-                              [currentQuestionIndex!]: e.target.value,
-                            }))
-                          }
-                          className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-[#5955B3] focus:ring-1 focus:ring-purple-200"
-                        >
-                          <option value="">Select correct answer</option>
-                          {currentQuestion.options.map((opt, i) => (
-                            <option key={i} value={opt}>
-                              {opt || `Option ${i + 1}`}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {/* Add Question Button */}
-                    <button
-                      onClick={addQuestion}
-                      className="w-full bg-[#5955B3] text-white py-3 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[#4b49a0] transition shadow-sm"
-                    >
-                      <PlusCircle className="w-5 h-5" />
-                      Add Question
-                    </button>
-
-                    {/* Quiz Settings */}
+                  {/* Answer Selection */}
+                  {currentQuestion.type === "multiple_choice" && (
                     <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Quiz Settings
+                        Answer
                       </label>
-                      <select className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200">
-                        <option>Default Settings</option>
-                        <option>Timed Quiz</option>
-                        <option>Randomize Questions</option>
-                        <option>Show Results Immediately</option>
+                      <select
+                        value={selectedAnswer[currentQuestionIndex!] || ""}
+                        onChange={(e) =>
+                          setSelectedAnswer((prev) => ({
+                            ...prev,
+                            [currentQuestionIndex!]: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-[#5955B3] focus:ring-1 focus:ring-purple-200"
+                      >
+                        <option value="">Select correct answer</option>
+                        {currentQuestion.options.map((opt, i) => (
+                          <option key={i} value={opt}>
+                            {opt || `Option ${i + 1}`}
+                          </option>
+                        ))}
                       </select>
                     </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {/* Empty State - Show create button */}
-                    <div className="bg-white border border-gray-300 rounded-lg p-8 text-center shadow-sm">
-                      <p className="text-gray-500 mb-4">
-                        No questions yet. Create your first question to get
-                        started.
-                      </p>
-                      <button
-                        onClick={addQuestion}
-                        className="bg-[#5955B3] text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[#4b49a0] transition shadow-sm mx-auto"
-                      >
-                        <PlusCircle className="w-5 h-5" />
-                        Create Question
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
 
-              {/* RIGHT SIDE: PREVIEW */}
-              <div className="flex-1">
-                <div className="bg-white border border-gray-300 rounded-lg shadow-sm h-full flex flex-col">
-                  {/* Preview Header with Buttons */}
-                  <div className="flex items-center justify-end gap-2 p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+                  {/* Add Question Button */}
+                  <button
+                    onClick={addQuestion}
+                    className="w-full bg-[#5955B3] text-white py-3 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[#4b49a0] transition shadow-sm"
+                  >
+                    <PlusCircle className="w-5 h-5" />
+                    Add Question
+                  </button>
+
+                  {/* Quiz Settings */}
+                  <div className="bg-white border border-gray-300 rounded-lg p-4 shadow-sm">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Quiz Settings
+                    </label>
+                    <select className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-200">
+                      <option>Default Settings</option>
+                      <option>Timed Quiz</option>
+                      <option>Randomize Questions</option>
+                      <option>Show Results Immediately</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {/* Empty State - Show create button */}
+                  <div className="bg-white border border-gray-300 rounded-lg p-8 text-center shadow-sm">
+                    <p className="text-gray-500 mb-4">
+                      No questions yet. Create your first question to get
+                      started.
+                    </p>
                     <button
-                    onClick={() => setPreviewMode(!previewMode)}
-                    className="flex items-center gap-2 bg-white border border-[#5955B3] text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition font-medium text-sm">
-                      <Eye className="w-4 h-4" />
-                      Preview
-                    </button>
-                    <button
-                      onClick={handleCreateQuiz}
-                      className="flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-md hover:bg-[#4b49a0] transition font-medium text-sm"
+                      onClick={addQuestion}
+                      className="bg-[#5955B3] text-white py-3 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[#4b49a0] transition shadow-sm mx-auto"
                     >
-                      <FilePlus2 className="w-4 h-4" />
-                      Create Quiz
+                      <PlusCircle className="w-5 h-5" />
+                      Create Question
                     </button>
                   </div>
+                </div>
+              )}
+            </div>
 
-                  {/* Questions Preview List */}
-                  <div className="flex-1 overflow-y-auto p-4">
-                    <QuestionPreview
-                      questions={questions}
-                      onQuestionSelect={(index) => setCurrentQuestionIndex(index)}
-                      currentQuestionIndex={currentQuestionIndex}
-                      onDelete={(index) => {
-                        deleteQuestion(index);
-                        if (currentQuestionIndex === index) {
-                          setCurrentQuestionIndex(
-                            questions.length > 1 ? Math.max(0, index - 1) : null
-                          );
-                        } else if (
-                          currentQuestionIndex !== null &&
-                          currentQuestionIndex > index
-                        ) {
-                          setCurrentQuestionIndex(currentQuestionIndex - 1);
-                        }
-                      }}
-                    />
-                  </div>
+            {/* RIGHT SIDE: PREVIEW */}
+            <div className="flex-1">
+              <div className="bg-white border border-gray-300 rounded-lg shadow-sm h-full flex flex-col">
+                {/* Preview Header with Buttons */}
+                <div className="flex items-center justify-end gap-2 p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+                  <button
+                  onClick={() => setPreviewMode(!previewMode)}
+                  className="flex items-center gap-2 bg-white border border-[#5955B3] text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition font-medium text-sm">
+                    <Eye className="w-4 h-4" />
+                    Preview
+                  </button>
+                  <button
+                    onClick={handleCreateQuiz}
+                    className="flex items-center gap-2 bg-[#5955B3] text-white px-4 py-2 rounded-md hover:bg-[#4b49a0] transition font-medium text-sm"
+                  >
+                    <FilePlus2 className="w-4 h-4" />
+                    Create Quiz
+                  </button>
+                </div>
+
+                {/* Questions Preview List */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  <QuestionPreview
+                    questions={questions}
+                    onQuestionSelect={(index) => setCurrentQuestionIndex(index)}
+                    currentQuestionIndex={currentQuestionIndex}
+                    onDelete={(index) => {
+                      deleteQuestion(index);
+                      if (currentQuestionIndex === index) {
+                        setCurrentQuestionIndex(
+                          questions.length > 1 ? Math.max(0, index - 1) : null
+                        );
+                      } else if (
+                        currentQuestionIndex !== null &&
+                        currentQuestionIndex > index
+                      ) {
+                        setCurrentQuestionIndex(currentQuestionIndex - 1);
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </div>
-          </main>
-        </section>
-      </div>
-    </Suspense>
+          </div>
+        </main>
+      </section>
+    </div>
   );
 }
 
-export const Loading = () => {
-  return(
-    "Loading..."
-  )
+export default function QuizPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Quiz />
+    </Suspense>
+  );
 }
